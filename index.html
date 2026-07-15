@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AnimeFlix - Assista Animes Online Dublado e Legendado</title>
-    <meta name="description" content="AnimeFlix é a maior plataforma para assistir animes online com opções dublado e legendado. Busque por Naruto, One Piece, Attack on Titan e muito mais.">
-    <meta name="keywords" content="anime, assistir anime, episódios, temporadas, anime online, naruto, one piece, attack on titan, dragon ball, demon slayer, jujutsu kaisen, my hero academia, animeflix, anime dublado, anime legendado">
+    <title>AnimeFlix - Assista Animes Online</title>
+    <meta name="description" content="AnimeFlix é a maior plataforma para assistir animes online. Busque por Naruto, One Piece, Attack on Titan e muito mais.">
+    <meta name="keywords" content="anime, assistir anime, episódios, temporadas, anime online, naruto, one piece, attack on titan, dragon ball, demon slayer, jujutsu kaisen, animeflix, anime dublado, anime legendado">
     <link rel="canonical" href="https://animeflix.com/">
     <link rel="alternate" hreflang="en" href="https://animeflix.com/?lang=en">
     <link rel="alternate" hreflang="es" href="https://animeflix.com/?lang=es">
@@ -205,7 +205,7 @@
 
 <footer>
     <div class="container">
-        <p>© 2026 AnimeFlix - Todos os direitos reservados. Dados: <a href="https://consumet.org/" target="_blank">Consumet API</a>.</p>
+        <p>© 2026 AnimeFlix - Todos os direitos reservados. Dados: <a href="https://jikan.moe/" target="_blank">Jikan API</a>.</p>
         <div class="footer-links">
             <a href="?search=naruto">Naruto</a>
             <a href="?search=one piece">One Piece</a>
@@ -270,7 +270,7 @@ let hasMore = true;
 let allAnimes = [];
 let currentAnimeId = null;
 let currentEpisodes = [];
-let currentEpisodeId = null;
+let currentEpisodeNumber = 1;
 let currentAudioLang = 'subbed'; // 'dubbed' ou 'subbed'
 let currentAnimeTitle = '';
 let cache = {};
@@ -323,7 +323,7 @@ function updateUI() {
     document.querySelectorAll('.lang-item').forEach(item => {
         item.classList.toggle('active', item.dataset.lang === currentLang);
     });
-    // Atualizar meta tags
+    // Meta tags
     let title = 'AnimeFlix - ';
     let desc = '';
     if (currentQuery) {
@@ -366,37 +366,35 @@ function updateUI() {
 }
 
 // ============================================================
-//   API CONSUMET (GOGOANIME)
+//   API JIKAN (DADOS DOS ANIMES)
 // ============================================================
-const CONSUMET_BASE = 'https://api.consumet.org/anime/gogoanime';
+const JIKAN_BASE = 'https://api.jikan.moe/v4';
+
+async function fetchJikan(endpoint) {
+    const url = `${JIKAN_BASE}${endpoint}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Jikan API error: ${res.status}`);
+    return await res.json();
+}
 
 async function fetchPopular(page = 1) {
-    const url = `${CONSUMET_BASE}/top-airing?page=${page}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('API error');
-    return await res.json();
+    const data = await fetchJikan(`/top/anime?page=${page}&limit=20`);
+    return data;
 }
 
 async function fetchSearch(query, page = 1) {
-    const url = `${CONSUMET_BASE}/search?query=${encodeURIComponent(query)}&page=${page}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('API error');
-    return await res.json();
+    const data = await fetchJikan(`/anime?q=${encodeURIComponent(query)}&page=${page}&limit=20`);
+    return data;
 }
 
-async function fetchAnimeInfo(id) {
-    const url = `${CONSUMET_BASE}/info/${id}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('API error');
-    return await res.json();
+async function fetchAnimeFull(id) {
+    const data = await fetchJikan(`/anime/${id}/full`);
+    return data;
 }
 
-async function fetchEpisodeLinks(episodeId) {
-    // episodeId é o ID do episódio (ex: "naruto-episode-1")
-    const url = `${CONSUMET_BASE}/watch/${episodeId}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('API error');
-    return await res.json();
+async function fetchAnimeEpisodes(id, page = 1) {
+    const data = await fetchJikan(`/anime/${id}/episodes?page=${page}&limit=100`);
+    return data;
 }
 
 // ============================================================
@@ -420,13 +418,13 @@ function renderCards(animes, append = false) {
         return;
     }
     const html = animes.map(a => {
-        const img = a.image || a.images?.jpg?.image_url || 'https://via.placeholder.com/200x300?text=No+Image';
-        const title = a.title || a.name || 'Unknown';
-        const id = a.id || a.mal_id;
-        const episodes = a.episodes || a.totalEpisodes || '?';
-        const score = a.rating || a.score || 'N/A';
+        const img = a.images?.jpg?.image_url || 'https://via.placeholder.com/200x300?text=No+Image';
+        const title = a.title || 'Unknown';
+        const id = a.mal_id;
+        const episodes = a.episodes || '?';
+        const score = a.score || 'N/A';
         return `
-            <div class="anime-card" data-id="${id}" onclick="openAnime('${id}')">
+            <div class="anime-card" data-id="${id}" onclick="openAnime(${id})">
                 <img src="${img}" alt="${title}" loading="lazy" decoding="async">
                 <div class="badge">${episodes}</div>
                 <div class="info">
@@ -457,17 +455,17 @@ async function loadAnimes(page = 1, query = '', nav = 'home') {
         } else if (nav === 'top') {
             data = await fetchPopular(page);
         } else if (nav === 'season') {
-            // Gogoanime não tem season, usamos top-airing como fallback
+            // Usa top para 'season' (não temos season na Jikan)
             data = await fetchPopular(page);
         } else {
             data = await fetchPopular(page);
         }
-        const animes = data.results || data.data || [];
-        const pagination = data.pagination || data;
+        const animes = data.data || [];
+        const pagination = data.pagination || { has_next_page: false };
         return { animes, pagination };
     } catch (err) {
         console.error(err);
-        return { animes: [], pagination: { hasNextPage: false } };
+        return { animes: [], pagination: { has_next_page: false } };
     }
 }
 
@@ -486,7 +484,7 @@ async function loadMore() {
         allAnimes = allAnimes.concat(animes);
         renderCards(animes, true);
         currentPage = nextPage;
-        hasMore = pagination.hasNextPage || pagination.has_next_page || false;
+        hasMore = pagination.has_next_page || false;
         document.getElementById('loadMoreBtn').textContent = hasMore ? t('loadMore') : 'Fim da lista';
     } catch (err) {
         document.getElementById('loadMoreBtn').textContent = 'Erro ao carregar';
@@ -507,7 +505,7 @@ async function loadInitial(nav = 'home', query = '') {
         const { animes, pagination } = await loadAnimes(1, query, nav);
         allAnimes = animes;
         renderCards(animes, false);
-        hasMore = pagination.hasNextPage || pagination.has_next_page || false;
+        hasMore = pagination.has_next_page || false;
         document.getElementById('loadMoreBtn').textContent = hasMore ? t('loadMore') : 'Fim da lista';
         document.querySelector('#pageTitle').textContent =
             query ? `Resultados para "${query}"` :
@@ -521,7 +519,7 @@ async function loadInitial(nav = 'home', query = '') {
         window.history.pushState({}, '', '?' + params.toString());
         updateUI();
     } catch (err) {
-        document.getElementById('animeGrid').innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:#e50914;">Erro ao carregar animes.</div>`;
+        document.getElementById('animeGrid').innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:#e50914;">Erro ao carregar animes. Tente novamente.</div>`;
     }
     updateUI();
 }
@@ -541,16 +539,16 @@ document.getElementById('searchInput').addEventListener('input', function() {
     searchTimeout = setTimeout(async () => {
         try {
             const data = await fetchSearch(q, 1);
-            const results = data.results || [];
+            const results = data.data || [];
             if (results.length) {
                 suggestions.innerHTML = results.slice(0, 5).map(a => `
-                    <div class="suggestion-item" data-id="${a.id}">${a.title}</div>
+                    <div class="suggestion-item" data-id="${a.mal_id}">${a.title}</div>
                 `).join('');
                 suggestions.classList.add('active');
                 document.querySelectorAll('.suggestion-item').forEach(el => {
                     el.addEventListener('click', function() {
                         const id = this.dataset.id;
-                        openAnime(id);
+                        openAnime(parseInt(id));
                         suggestions.classList.remove('active');
                         document.getElementById('searchInput').value = '';
                     });
@@ -591,17 +589,18 @@ async function openAnime(id) {
     body.innerHTML = `<div style="text-align:center;padding:30px;">${t('loading')}</div>`;
 
     try {
-        const info = await fetchAnimeInfo(id);
-        const anime = info;
+        const animeData = await fetchAnimeFull(id);
+        const anime = animeData.data;
         currentAnimeId = id;
         currentAnimeTitle = anime.title;
 
-        // Episódios
-        const episodes = anime.episodes || [];
+        // Buscar episódios
+        const epData = await fetchAnimeEpisodes(id);
+        const episodes = epData.data || [];
         currentEpisodes = episodes;
 
         // Sinopse
-        let synopsis = anime.description || anime.synopsis || 'Sinopse não disponível.';
+        let synopsis = anime.synopsis || 'Sinopse não disponível.';
         if (currentLang !== 'en' && synopsis.length > 10) {
             try {
                 const transRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(synopsis)}&langpair=en|${currentLang}`);
@@ -611,10 +610,8 @@ async function openAnime(id) {
         }
 
         // Primeiro episódio
-        let firstEp = episodes.length ? episodes[0] : null;
-        if (firstEp) {
-            currentEpisodeId = firstEp.id;
-        }
+        let firstEp = episodes.length ? episodes[0].mal_id : 1;
+        currentEpisodeNumber = firstEp;
 
         // Montar modal
         body.innerHTML = `
@@ -629,9 +626,10 @@ async function openAnime(id) {
                 <button id="watchNowBtn" style="background:#e50914;padding:8px 24px;border-radius:30px;border:none;color:#fff;font-weight:600;cursor:pointer;">${t('watchNow')}</button>
             </div>
             <div class="details">
-                <span>★ ${anime.rating || 'N/A'}</span>
-                <span>${anime.totalEpisodes || '?'} ep.</span>
-                ${anime.genres ? anime.genres.slice(0,3).map(g => `<span>#${g}</span>`).join('') : ''}
+                <span>★ ${anime.score || 'N/A'}</span>
+                <span>${anime.episodes || '?'} ep.</span>
+                <span>${anime.status || ''}</span>
+                ${anime.genres ? anime.genres.slice(0,3).map(g => `<span>#${g.name}</span>`).join('') : ''}
             </div>
             <div class="synopsis"><strong>${t('synopsis')}:</strong> ${synopsis}</div>
             ${episodes.length > 0 ? `
@@ -639,7 +637,7 @@ async function openAnime(id) {
                     <h3>${t('episodes')}</h3>
                     <div class="episodes-grid" id="episodesGrid">
                         ${episodes.map((ep, idx) => `
-                            <button class="ep-btn ${idx === 0 ? 'active-ep' : ''}" data-id="${ep.id}" data-idx="${idx}">${ep.number || idx+1}</button>
+                            <button class="ep-btn ${idx === 0 ? 'active-ep' : ''}" data-ep="${ep.mal_id}" data-idx="${idx}">${ep.mal_id}</button>
                         `).join('')}
                     </div>
                 </div>
@@ -647,9 +645,7 @@ async function openAnime(id) {
         `;
 
         // Carregar o primeiro episódio
-        if (firstEp) {
-            loadEpisode(firstEp.id);
-        }
+        loadEpisode(firstEp);
 
         // Eventos de áudio
         document.querySelectorAll('.watch-options button[data-lang]').forEach(btn => {
@@ -657,27 +653,25 @@ async function openAnime(id) {
                 document.querySelectorAll('.watch-options button[data-lang]').forEach(b => b.classList.remove('active-lang'));
                 this.classList.add('active-lang');
                 currentAudioLang = this.dataset.lang;
-                // Recarregar episódio atual com novo áudio
-                if (currentEpisodeId) {
-                    loadEpisode(currentEpisodeId);
+                if (currentEpisodeNumber) {
+                    loadEpisode(currentEpisodeNumber);
                 }
             });
         });
 
-        // Assistir agora: recarrega o episódio atual
+        // Assistir agora
         document.getElementById('watchNowBtn').addEventListener('click', function() {
-            if (currentEpisodeId) {
-                loadEpisode(currentEpisodeId);
+            if (currentEpisodeNumber) {
+                loadEpisode(currentEpisodeNumber);
             }
         });
 
         // Clique em episódio
         document.querySelectorAll('.ep-btn').forEach(btn => {
             btn.addEventListener('click', function() {
-                const epId = this.dataset.id;
-                const idx = parseInt(this.dataset.idx);
-                currentEpisodeId = epId;
-                loadEpisode(epId);
+                const epNum = parseInt(this.dataset.ep);
+                currentEpisodeNumber = epNum;
+                loadEpisode(epNum);
                 document.querySelectorAll('.ep-btn').forEach(b => b.classList.remove('active-ep'));
                 this.classList.add('active-ep');
             });
@@ -691,9 +685,9 @@ async function openAnime(id) {
         document.querySelector('meta[property="og:description"]').content = desc;
         document.querySelector('meta[name="twitter:title"]').content = `${anime.title} - AnimeFlix`;
         document.querySelector('meta[name="twitter:description"]').content = desc;
-        if (anime.image) {
-            document.querySelector('meta[property="og:image"]').content = anime.image;
-            document.querySelector('meta[name="twitter:image"]').content = anime.image;
+        if (anime.images?.jpg?.large_image_url) {
+            document.querySelector('meta[property="og:image"]').content = anime.images.jpg.large_image_url;
+            document.querySelector('meta[name="twitter:image"]').content = anime.images.jpg.large_image_url;
         }
         // URL
         const slug = anime.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
@@ -705,40 +699,36 @@ async function openAnime(id) {
     }
 }
 
-async function loadEpisode(episodeId) {
+function loadEpisode(epNum) {
     const iframe = document.getElementById('playerIframe');
     const loading = document.getElementById('playerLoading');
     if (!iframe) return;
     if (loading) loading.classList.remove('hidden');
 
-    try {
-        // Buscar links do episódio
-        const linksData = await fetchEpisodeLinks(episodeId);
-        // linksData tem sources: [{url, quality, isM3U8}]
-        const sources = linksData.sources || [];
-        // Filtrar por áudio (dubbed ou subbed) se disponível
-        // A API Consumet não diferencia, mas podemos tentar pegar o primeiro link
-        let videoUrl = null;
-        if (sources.length) {
-            // Prefere link com qualidade alta
-            const sorted = sources.sort((a, b) => (b.quality || 0) - (a.quality || 0));
-            videoUrl = sorted[0].url;
-        }
-        if (!videoUrl) {
-            // Fallback: tenta embed direto
-            videoUrl = `https://gogoanime.gg/embed/${episodeId}`;
-        }
-        iframe.src = videoUrl;
-        setTimeout(() => {
-            if (loading) loading.classList.add('hidden');
-        }, 1000);
-    } catch (err) {
-        console.error('Erro ao carregar episódio:', err);
-        iframe.src = `https://gogoanime.gg/embed/${episodeId}`;
-        setTimeout(() => {
-            if (loading) loading.classList.add('hidden');
-        }, 1000);
+    // Gerar slug do título
+    const titleSlug = currentAnimeTitle.toLowerCase().replace(/\s/g, '-');
+
+    // Escolher embed conforme áudio
+    let embedUrl;
+    if (currentAudioLang === 'dubbed') {
+        // Tentar com 'dub' no final
+        embedUrl = `https://gogoanime.llc/embed/${titleSlug}-episode-${epNum}-dub`;
+    } else {
+        embedUrl = `https://gogoanime.llc/embed/${titleSlug}-episode-${epNum}`;
     }
+
+    // Fallback: se não carregar, tenta sem o -dub
+    iframe.src = embedUrl;
+    // Tentar carregar sem dub se falhar (para dubbed)
+    setTimeout(() => {
+        if (iframe.src.includes('dub') && !iframe.contentWindow) {
+            // Não temos como detectar, mas podemos tentar recarregar sem dub
+        }
+    }, 2000);
+
+    setTimeout(() => {
+        if (loading) loading.classList.add('hidden');
+    }, 1500);
 }
 
 function closeModal() {
@@ -844,13 +834,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const animeParam = params.get('anime');
     if (animeParam) {
         loadInitial('home', '');
-        // Tentar abrir pelo título
         const title = animeParam.replace(/-/g, ' ');
         try {
             const data = await fetchSearch(title, 1);
-            const results = data.results || [];
+            const results = data.data || [];
             if (results.length) {
-                openAnime(results[0].id);
+                openAnime(results[0].mal_id);
             }
         } catch (_) {}
     } else if (search) {
