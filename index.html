@@ -4,10 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AnimeFlix - Assista Animes Online Grátis</title>
-    <meta name="description" content="AnimeFlix é a melhor plataforma para assistir animes online. Busque, descubra e maratone seus animes favoritos com episódios e temporadas completas.">
-    <meta name="keywords" content="anime, assistir anime, episódios, temporadas, anime online, naruto, one piece">
+    <meta name="description" content="AnimeFlix é a maior plataforma para assistir animes online. Busque por Naruto, One Piece, Attack on Titan e muito mais. Episódios, temporadas e sinopse atualizados.">
+    <meta name="keywords" content="anime, assistir anime, episódios, temporadas, anime online, naruto, one piece, attack on titan, dragon ball, demon slayer, jujutsu kaisen, my hero academia, animeflix, assistir anime grátis, anime dublado, anime legendado">
     <link rel="canonical" href="https://animeflix.com/">
-    <!-- Open Graph -->
+    <link rel="alternate" hreflang="en" href="https://animeflix.com/?lang=en">
+    <link rel="alternate" hreflang="es" href="https://animeflix.com/?lang=es">
+    <link rel="alternate" hreflang="pt" href="https://animeflix.com/">
+    <link rel="alternate" hreflang="x-default" href="https://animeflix.com/">
     <meta property="og:title" content="AnimeFlix - Assista Animes Online">
     <meta property="og:description" content="O maior acervo de animes com busca, episódios e sinopse. Grátis e sem redirecionamentos.">
     <meta property="og:image" content="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23e50914' d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z'/></svg>">
@@ -15,142 +18,128 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="AnimeFlix - Assista Animes Online">
     <meta name="twitter:description" content="Pesquise e descubra animes com informações completas e player integrado.">
-    <meta name="twitter:image" content="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23e50914' d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z'/></svg>">
-    <!-- Favicon inline -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23e50914' d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z'/></svg>">
-    <!-- JSON-LD -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "AnimeFlix",
-      "url": "https://animeflix.com/",
-      "description": "Plataforma para assistir animes online gratuitamente.",
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://animeflix.com/?search={search_term_string}",
-        "query-input": "required name=search_term_string"
-      }
-    }
-    </script>
     <style>
-        /* RESET & BASE */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a0f; color: #fff; overflow-x: hidden; }
-        a { color: #e50914; text-decoration: none; }
-        .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+        /* ===== RESET & BASE ===== */
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:#0a0a0f; color:#fff; overflow-x:hidden; }
+        a { color:#e50914; text-decoration:none; }
+        .container { max-width:1400px; margin:0 auto; padding:0 20px; }
 
-        /* HEADER */
-        header { background: linear-gradient(180deg, #0a0a0f 0%, rgba(10,10,15,0.95) 100%); padding: 14px 0; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .header-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-        .logo { display: flex; align-items: center; font-size: 26px; font-weight: 800; letter-spacing: -0.5px; color: #e50914; cursor: pointer; }
-        .logo svg { height: 34px; margin-right: 6px; fill: #e50914; }
-        .logo span { color: #fff; font-weight: 300; }
+        /* ===== HEADER ===== */
+        header { background:linear-gradient(180deg,#0a0a0f 0%,rgba(10,10,15,0.95) 100%); padding:14px 0; position:sticky; top:0; z-index:100; border-bottom:1px solid rgba(255,255,255,0.05); }
+        .header-inner { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+        .logo { display:flex; align-items:center; font-size:26px; font-weight:800; letter-spacing:-0.5px; color:#e50914; cursor:pointer; }
+        .logo svg { height:34px; margin-right:6px; fill:#e50914; }
+        .logo span { color:#fff; font-weight:300; }
+        .search-wrapper { flex:1; min-width:180px; max-width:480px; position:relative; display:flex; align-items:center; }
+        .search-wrapper input { width:100%; padding:9px 16px 9px 20px; border:none; border-radius:30px 0 0 30px; background:rgba(255,255,255,0.08); color:#fff; font-size:14px; outline:1px solid transparent; transition:0.3s; }
+        .search-wrapper input:focus { outline-color:#e50914; background:rgba(255,255,255,0.12); }
+        .search-wrapper input::placeholder { color:#aaa; }
+        .search-wrapper .search-btn { background:#e50914; border:none; border-radius:0 30px 30px 0; color:#fff; padding:0 18px; height:40px; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:0.2s; font-size:18px; }
+        .search-wrapper .search-btn:hover { background:#b20710; }
+        .search-suggestions { position:absolute; top:110%; left:0; right:0; background:#1a1a24; border-radius:12px; padding:6px 0; max-height:280px; overflow-y:auto; display:none; z-index:50; box-shadow:0 10px 30px rgba(0,0,0,0.8); }
+        .search-suggestions.active { display:block; }
+        .search-suggestions .suggestion-item { padding:8px 18px; cursor:pointer; transition:0.15s; font-size:14px; }
+        .search-suggestions .suggestion-item:hover { background:#2a2a3a; }
+        .lang-dropdown { position:relative; }
+        .lang-dropdown .lang-toggle { background:transparent; border:1px solid #444; border-radius:30px; padding:6px 14px; color:#fff; font-size:13px; font-weight:500; cursor:pointer; display:flex; align-items:center; gap:6px; transition:0.2s; }
+        .lang-dropdown .lang-toggle:hover { border-color:#e50914; background:rgba(229,9,20,0.1); }
+        .lang-dropdown .lang-menu { position:absolute; top:110%; right:0; background:#1a1a24; border-radius:12px; padding:8px 0; min-width:150px; display:none; box-shadow:0 10px 30px rgba(0,0,0,0.8); }
+        .lang-dropdown .lang-menu.active { display:block; }
+        .lang-dropdown .lang-menu .lang-item { padding:8px 20px; cursor:pointer; transition:0.15s; font-size:14px; display:flex; align-items:center; gap:8px; }
+        .lang-dropdown .lang-menu .lang-item:hover { background:#2a2a3a; }
+        .lang-dropdown .lang-menu .lang-item.active { color:#e50914; font-weight:600; }
+        nav { display:flex; gap:24px; padding:10px 0 4px; border-top:1px solid rgba(255,255,255,0.05); margin-top:6px; flex-wrap:wrap; }
+        nav a { color:#aaa; font-size:14px; font-weight:500; cursor:pointer; transition:0.2s; position:relative; }
+        nav a::after { content:''; position:absolute; bottom:-4px; left:0; width:0; height:2px; background:#e50914; transition:0.3s; }
+        nav a:hover, nav a.active { color:#fff; }
+        nav a:hover::after, nav a.active::after { width:100%; }
 
-        /* SEARCH */
-        .search-wrapper { flex: 1; min-width: 180px; max-width: 480px; position: relative; display: flex; align-items: center; }
-        .search-wrapper input { width: 100%; padding: 9px 16px 9px 20px; border: none; border-radius: 30px 0 0 30px; background: rgba(255,255,255,0.08); color: #fff; font-size: 14px; outline: 1px solid transparent; transition: 0.3s; }
-        .search-wrapper input:focus { outline-color: #e50914; background: rgba(255,255,255,0.12); }
-        .search-wrapper input::placeholder { color: #aaa; }
-        .search-wrapper .search-btn { background: #e50914; border: none; border-radius: 0 30px 30px 0; color: #fff; padding: 0 18px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; font-size: 18px; }
-        .search-wrapper .search-btn:hover { background: #b20710; }
-        .search-suggestions { position: absolute; top: 110%; left: 0; right: 0; background: #1a1a24; border-radius: 12px; padding: 6px 0; max-height: 280px; overflow-y: auto; display: none; z-index: 50; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
-        .search-suggestions.active { display: block; }
-        .search-suggestions .suggestion-item { padding: 8px 18px; cursor: pointer; transition: 0.15s; font-size: 14px; }
-        .search-suggestions .suggestion-item:hover { background: #2a2a3a; }
+        /* ===== HERO ===== */
+        .hero { margin:20px 0 30px; border-radius:20px; overflow:hidden; position:relative; background:#111; min-height:280px; display:flex; align-items:flex-end; padding:40px; background-size:cover; background-position:center; background-image:linear-gradient(135deg,#1a1a2e,#0a0a0f); }
+        .hero-content { max-width:600px; z-index:2; }
+        .hero-content h1 { font-size:38px; font-weight:800; margin-bottom:6px; text-shadow:0 4px 20px rgba(0,0,0,0.8); }
+        .hero-content p { font-size:16px; color:#ccc; margin-bottom:14px; text-shadow:0 2px 10px rgba(0,0,0,0.6); }
+        .hero-content .btn { display:inline-block; background:#e50914; color:#fff; padding:10px 28px; border-radius:30px; font-weight:600; border:none; cursor:pointer; transition:0.3s; font-size:14px; }
+        .hero-content .btn:hover { background:#b20710; transform:scale(1.02); }
+        .hero-overlay { position:absolute; inset:0; background:linear-gradient(90deg,rgba(10,10,15,0.9) 0%,transparent 80%); z-index:1; }
 
-        /* LANGUAGE DROPDOWN */
-        .lang-dropdown { position: relative; }
-        .lang-dropdown .lang-toggle { background: transparent; border: 1px solid #444; border-radius: 30px; padding: 6px 14px; color: #fff; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
-        .lang-dropdown .lang-toggle:hover { border-color: #e50914; background: rgba(229,9,20,0.1); }
-        .lang-dropdown .lang-menu { position: absolute; top: 110%; right: 0; background: #1a1a24; border-radius: 12px; padding: 8px 0; min-width: 150px; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
-        .lang-dropdown .lang-menu.active { display: block; }
-        .lang-dropdown .lang-menu .lang-item { padding: 8px 20px; cursor: pointer; transition: 0.15s; font-size: 14px; display: flex; align-items: center; gap: 8px; }
-        .lang-dropdown .lang-menu .lang-item:hover { background: #2a2a3a; }
-        .lang-dropdown .lang-menu .lang-item.active { color: #e50914; font-weight: 600; }
+        /* ===== GRID ===== */
+        .section-title { font-size:24px; font-weight:700; margin:30px 0 18px; letter-spacing:-0.3px; }
+        .anime-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:20px; }
+        .anime-card { background:#14141e; border-radius:14px; overflow:hidden; transition:transform 0.25s,box-shadow 0.25s; cursor:pointer; position:relative; }
+        .anime-card:hover { transform:scale(1.04); box-shadow:0 15px 30px rgba(0,0,0,0.7); z-index:10; }
+        .anime-card img { width:100%; aspect-ratio:2/3; object-fit:cover; display:block; }
+        .anime-card .info { padding:12px 14px 14px; }
+        .anime-card .title { font-size:15px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .anime-card .meta { display:flex; justify-content:space-between; font-size:13px; color:#888; margin-top:4px; }
+        .anime-card .score { color:#f5c518; }
+        .anime-card .badge { position:absolute; top:10px; right:10px; background:rgba(229,9,20,0.85); padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; backdrop-filter:blur(4px); }
 
-        /* NAV */
-        nav { display: flex; gap: 24px; padding: 10px 0 4px; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 6px; flex-wrap: wrap; }
-        nav a { color: #aaa; font-size: 14px; font-weight: 500; cursor: pointer; transition: 0.2s; position: relative; }
-        nav a::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px; background: #e50914; transition: 0.3s; }
-        nav a:hover, nav a.active { color: #fff; }
-        nav a:hover::after, nav a.active::after { width: 100%; }
+        /* ===== SKELETON LOADING ===== */
+        .skeleton { background:linear-gradient(90deg,#1a1a24 25%,#2a2a3a 50%,#1a1a24 75%); background-size:200% 100%; animation:skeleton 1.5s infinite; border-radius:14px; aspect-ratio:2/3; }
+        @keyframes skeleton { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 
-        /* HERO */
-        .hero { margin: 20px 0 30px; border-radius: 20px; overflow: hidden; position: relative; background: #111; min-height: 280px; display: flex; align-items: flex-end; padding: 40px; background-size: cover; background-position: center; background-image: linear-gradient(135deg, #1a1a2e, #0a0a0f); }
-        .hero-content { max-width: 600px; z-index: 2; }
-        .hero-content h1 { font-size: 38px; font-weight: 800; margin-bottom: 6px; text-shadow: 0 4px 20px rgba(0,0,0,0.8); }
-        .hero-content p { font-size: 16px; color: #ccc; margin-bottom: 14px; text-shadow: 0 2px 10px rgba(0,0,0,0.6); }
-        .hero-content .btn { display: inline-block; background: #e50914; color: #fff; padding: 10px 28px; border-radius: 30px; font-weight: 600; border: none; cursor: pointer; transition: 0.3s; font-size: 14px; }
-        .hero-content .btn:hover { background: #b20710; transform: scale(1.02); }
-        .hero-overlay { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(10,10,15,0.9) 0%, transparent 80%); z-index: 1; }
+        /* ===== LOAD MORE ===== */
+        .load-more { text-align:center; margin:30px 0 20px; }
+        .load-more button { background:#1f1f2e; border:none; color:#fff; padding:12px 40px; border-radius:40px; font-weight:600; font-size:15px; cursor:pointer; transition:0.3s; }
+        .load-more button:hover { background:#2f2f42; transform:scale(1.02); }
 
-        /* GRID */
-        .section-title { font-size: 24px; font-weight: 700; margin: 30px 0 18px; letter-spacing: -0.3px; }
-        .anime-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
-        .anime-card { background: #14141e; border-radius: 14px; overflow: hidden; transition: transform 0.25s, box-shadow 0.25s; cursor: pointer; position: relative; }
-        .anime-card:hover { transform: scale(1.04); box-shadow: 0 15px 30px rgba(0,0,0,0.7); z-index: 10; }
-        .anime-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; }
-        .anime-card .info { padding: 12px 14px 14px; }
-        .anime-card .title { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .anime-card .meta { display: flex; justify-content: space-between; font-size: 13px; color: #888; margin-top: 4px; }
-        .anime-card .score { color: #f5c518; }
-        .anime-card .badge { position: absolute; top: 10px; right: 10px; background: rgba(229,9,20,0.85); padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; backdrop-filter: blur(4px); }
+        /* ===== MODAL ===== */
+        .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); display:none; justify-content:center; align-items:center; z-index:999; padding:20px; }
+        .modal-overlay.active { display:flex; }
+        .modal { background:#14141e; max-width:1100px; width:100%; border-radius:24px; max-height:96vh; overflow-y:auto; padding:25px; position:relative; animation:modalFade 0.25s; }
+        @keyframes modalFade { from { opacity:0; transform:scale(0.95); } to { opacity:1; transform:scale(1); } }
+        .modal-close { position:sticky; top:0; float:right; background:rgba(255,255,255,0.05); border:none; color:#fff; width:40px; height:40px; border-radius:50%; font-size:24px; cursor:pointer; transition:0.2s; display:flex; align-items:center; justify-content:center; z-index:10; }
+        .modal-close:hover { background:#e50914; }
+        .modal-player { width:100%; aspect-ratio:16/9; background:#000; border-radius:16px; overflow:hidden; margin-bottom:20px; position:relative; }
+        .modal-player iframe { width:100%; height:100%; border:none; }
+        .modal-player .player-loading { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:#111; color:#888; font-size:16px; pointer-events:none; transition:opacity 0.3s; }
+        .modal-player .player-loading.hidden { opacity:0; }
+        .modal h2 { font-size:28px; margin-bottom:8px; }
+        .modal .synopsis { color:#ccc; line-height:1.7; margin:12px 0; }
+        .modal .details { display:flex; flex-wrap:wrap; gap:12px; margin:10px 0 16px; }
+        .modal .details span { background:#222; padding:4px 16px; border-radius:30px; font-size:13px; }
+        .modal .watch-btn { display:inline-block; background:#e50914; color:#fff; padding:10px 30px; border-radius:30px; font-weight:600; border:none; cursor:pointer; transition:0.3s; font-size:15px; margin-bottom:12px; }
+        .modal .watch-btn:hover { background:#b20710; transform:scale(1.02); }
+        .modal .episodes { margin-top:18px; }
+        .modal .episodes h3 { margin-bottom:10px; font-size:18px; }
+        .modal .episodes-grid { display:flex; flex-wrap:wrap; gap:8px; max-height:200px; overflow-y:auto; padding:4px 0; }
+        .modal .episodes-grid .ep-btn { background:#1f1f2e; border:none; color:#ddd; padding:6px 16px; border-radius:20px; font-size:13px; cursor:pointer; transition:0.2s; }
+        .modal .episodes-grid .ep-btn:hover { background:#e50914; color:#fff; }
+        .modal .episodes-grid .ep-btn.active-ep { background:#e50914; color:#fff; }
 
-        /* LOAD MORE */
-        .load-more { text-align: center; margin: 30px 0 20px; }
-        .load-more button { background: #1f1f2e; border: none; color: #fff; padding: 12px 40px; border-radius: 40px; font-weight: 600; font-size: 15px; cursor: pointer; transition: 0.3s; }
-        .load-more button:hover { background: #2f2f42; transform: scale(1.02); }
+        /* ===== AD ===== */
+        .ad-container { background:#1a1a24; border-radius:16px; padding:16px; text-align:center; color:#555; border:1px dashed #333; margin:24px 0; font-size:14px; }
+        .ad-container::before { content:"📢 Espaço para Anúncios Monetag"; display:block; color:#777; }
 
-        /* MODAL */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 999; padding: 20px; }
-        .modal-overlay.active { display: flex; }
-        .modal { background: #14141e; max-width: 1100px; width: 100%; border-radius: 24px; max-height: 96vh; overflow-y: auto; padding: 25px; position: relative; animation: modalFade 0.3s; }
-        @keyframes modalFade { from { opacity:0; transform:scale(0.92); } to { opacity:1; transform:scale(1); } }
-        .modal-close { position: sticky; top: 0; float: right; background: rgba(255,255,255,0.05); border: none; color: #fff; width: 40px; height: 40px; border-radius: 50%; font-size: 24px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; z-index: 10; }
-        .modal-close:hover { background: #e50914; }
-        .modal-player { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
-        .modal-player iframe { width: 100%; height: 100%; border: none; }
-        .modal h2 { font-size: 28px; margin-bottom: 8px; }
-        .modal .synopsis { color: #ccc; line-height: 1.7; margin: 12px 0; }
-        .modal .details { display: flex; flex-wrap: wrap; gap: 12px; margin: 10px 0 16px; }
-        .modal .details span { background: #222; padding: 4px 16px; border-radius: 30px; font-size: 13px; }
-        .modal .watch-btn { display: inline-block; background: #e50914; color: #fff; padding: 10px 30px; border-radius: 30px; font-weight: 600; border: none; cursor: pointer; transition: 0.3s; font-size: 15px; margin-bottom: 12px; }
-        .modal .watch-btn:hover { background: #b20710; transform: scale(1.02); }
-        .modal .episodes { margin-top: 18px; }
-        .modal .episodes h3 { margin-bottom: 10px; font-size: 18px; }
-        .modal .episodes-grid { display: flex; flex-wrap: wrap; gap: 8px; max-height: 200px; overflow-y: auto; padding: 4px 0; }
-        .modal .episodes-grid .ep-btn { background: #1f1f2e; border: none; color: #ddd; padding: 6px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; transition: 0.2s; }
-        .modal .episodes-grid .ep-btn:hover { background: #e50914; color: #fff; }
-        .modal .episodes-grid .ep-btn.active-ep { background: #e50914; color: #fff; }
+        /* ===== FOOTER ===== */
+        footer { background:#0a0a0f; border-top:1px solid #1a1a24; padding:30px 0; margin-top:40px; text-align:center; color:#666; font-size:14px; }
+        footer a { color:#e50914; }
+        .footer-links { display:flex; flex-wrap:wrap; justify-content:center; gap:8px 20px; margin-top:12px; font-size:13px; }
+        .footer-links a { color:#888; transition:0.2s; }
+        .footer-links a:hover { color:#e50914; }
 
-        /* AD */
-        .ad-container { background: #1a1a24; border-radius: 16px; padding: 16px; text-align: center; color: #555; border: 1px dashed #333; margin: 24px 0; font-size: 14px; }
-        .ad-container::before { content: "📢 Espaço para Anúncios Monetag"; display: block; color: #777; }
-
-        /* FOOTER */
-        footer { background: #0a0a0f; border-top: 1px solid #1a1a24; padding: 30px 0; margin-top: 40px; text-align: center; color: #666; font-size: 14px; }
-        footer a { color: #e50914; }
-
-        /* RESPONSIVE */
-        @media (max-width: 768px) {
-            .header-inner { flex-wrap: wrap; justify-content: center; }
-            .logo { font-size: 22px; }
-            .search-wrapper { max-width: 100%; }
-            .lang-dropdown .lang-toggle { font-size: 12px; padding: 4px 10px; }
-            nav { justify-content: center; gap: 14px; }
-            .hero { padding: 20px; min-height: 200px; }
-            .hero-content h1 { font-size: 28px; }
-            .anime-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
-            .modal { padding: 15px; }
-            .modal h2 { font-size: 22px; }
+        /* ===== RESPONSIVE ===== */
+        @media (max-width:768px) {
+            .header-inner { flex-wrap:wrap; justify-content:center; }
+            .logo { font-size:22px; }
+            .search-wrapper { max-width:100%; }
+            .lang-dropdown .lang-toggle { font-size:12px; padding:4px 10px; }
+            nav { justify-content:center; gap:14px; }
+            .hero { padding:20px; min-height:200px; }
+            .hero-content h1 { font-size:28px; }
+            .anime-grid { grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; }
+            .modal { padding:15px; }
+            .modal h2 { font-size:22px; }
         }
-        @media (max-width: 480px) {
-            .anime-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+        @media (max-width:480px) {
+            .anime-grid { grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); }
         }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #0a0a0f; }
-        ::-webkit-scrollbar-thumb { background: #e50914; border-radius: 10px; }
+        ::-webkit-scrollbar { width:6px; }
+        ::-webkit-scrollbar-track { background:#0a0a0f; }
+        ::-webkit-scrollbar-thumb { background:#e50914; border-radius:10px; }
     </style>
 </head>
 <body>
@@ -161,13 +150,11 @@
             <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
             <span>Anime</span>Flix
         </div>
-
         <div class="search-wrapper">
             <input type="text" id="searchInput" placeholder="Buscar animes..." autocomplete="off">
             <button class="search-btn" id="searchBtn">🔍</button>
             <div class="search-suggestions" id="suggestions"></div>
         </div>
-
         <div class="lang-dropdown" id="langDropdown">
             <button class="lang-toggle" id="langToggle">🌐 Português ▾</button>
             <div class="lang-menu" id="langMenu">
@@ -217,39 +204,61 @@
 <footer>
     <div class="container">
         <p>© 2026 AnimeFlix - Todos os direitos reservados. Dados: <a href="https://jikan.moe/" target="_blank">Jikan API</a>.</p>
-        <p style="margin-top:6px;">
-            <a href="/sitemap.xml">Sitemap</a> | 
-            <a href="/robots.txt">Robots</a> | 
+        <div class="footer-links" id="footerKeywords">
+            <a href="?search=naruto">Naruto</a>
+            <a href="?search=one piece">One Piece</a>
+            <a href="?search=attack on titan">Attack on Titan</a>
+            <a href="?search=demon slayer">Demon Slayer</a>
+            <a href="?search=jujutsu kaisen">Jujutsu Kaisen</a>
+            <a href="?search=my hero academia">My Hero Academia</a>
+            <a href="?search=dragon ball">Dragon Ball</a>
+            <a href="?search=bleach">Bleach</a>
+            <a href="?search=death note">Death Note</a>
+            <a href="?search=fullmetal alchemist">Fullmetal Alchemist</a>
+            <a href="?search=spy x family">Spy x Family</a>
+            <a href="?search=chainsaw man">Chainsaw Man</a>
+            <span style="color:#555;">|</span>
+            <a href="/sitemap.xml">Sitemap</a>
+            <a href="/robots.txt">Robots</a>
             <a href="#">Privacidade</a>
-        </p>
+        </div>
+        <div style="display:none;" aria-hidden="true">
+            assistir anime online, episódios de anime, temporadas de anime, anime dublado, anime legendado, animes populares, top animes, melhores animes, anime streaming
+        </div>
     </div>
 </footer>
 
 <script>
 // ============================================================
-//   TRADUÇÕES
+//   TRADUÇÕES + PALAVRAS-CHAVE
 // ============================================================
 const langDict = {
     en: {
         placeholder: 'Search animes...',
         home: 'Home', top: 'Top', season: 'Season', genres: 'Genres',
-        popular: 'Popular', heroTitle: 'Featured Animes', heroDesc: 'Discover the best animes and watch online for free.',
+        popular: 'Popular Animes', heroTitle: 'Featured Animes',
+        heroDesc: 'Discover the best animes and watch online for free. Search for Naruto, One Piece, Attack on Titan and more.',
         episodes: 'Episodes', score: 'Score', synopsis: 'Synopsis', close: 'Close',
-        loadMore: 'Load more', noResults: 'No animes found.', watchNow: '▶ Watch Now'
+        loadMore: 'Load more', noResults: 'No animes found.', watchNow: '▶ Watch Now',
+        loading: 'Loading...'
     },
     es: {
         placeholder: 'Buscar animes...',
         home: 'Inicio', top: 'Top', season: 'Temporada', genres: 'Géneros',
-        popular: 'Populares', heroTitle: 'Animes Destacados', heroDesc: 'Descubre los mejores animes y mira online gratis.',
+        popular: 'Animes Populares', heroTitle: 'Animes Destacados',
+        heroDesc: 'Descubre los mejores animes y mira online gratis. Busca Naruto, One Piece, Attack on Titan y más.',
         episodes: 'Episodios', score: 'Puntuación', synopsis: 'Sinopsis', close: 'Cerrar',
-        loadMore: 'Cargar más', noResults: 'No se encontraron animes.', watchNow: '▶ Ver Ahora'
+        loadMore: 'Cargar más', noResults: 'No se encontraron animes.', watchNow: '▶ Ver Ahora',
+        loading: 'Cargando...'
     },
     pt: {
         placeholder: 'Buscar animes...',
         home: 'Início', top: 'Top', season: 'Temporada', genres: 'Gêneros',
-        popular: 'Populares', heroTitle: 'Animes em Destaque', heroDesc: 'Descubra os melhores animes e assista online grátis.',
+        popular: 'Animes Populares', heroTitle: 'Animes em Destaque',
+        heroDesc: 'Descubra os melhores animes e assista online grátis. Busque por Naruto, One Piece, Attack on Titan e muito mais.',
         episodes: 'Episódios', score: 'Nota', synopsis: 'Sinopse', close: 'Fechar',
-        loadMore: 'Carregar mais', noResults: 'Nenhum anime encontrado.', watchNow: '▶ Assistir Agora'
+        loadMore: 'Carregar mais', noResults: 'Nenhum anime encontrado.', watchNow: '▶ Assistir Agora',
+        loading: 'Carregando...'
     }
 };
 
@@ -266,9 +275,10 @@ let allAnimes = [];
 let currentAnimeId = null;
 let currentEpisodes = [];
 let currentEpisodeIndex = 0;
+let cache = {}; // cache simples para animes
 
 // ============================================================
-//   DETECTAR IDIOMA POR IP
+//   DETECTAR IDIOMA
 // ============================================================
 async function detectLanguage() {
     try {
@@ -281,50 +291,97 @@ async function detectLanguage() {
             if (['PT','BR'].includes(cc)) return 'pt';
         }
     } catch (_) {}
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('lang')) {
+        const l = params.get('lang');
+        if (['en','es','pt'].includes(l)) return l;
+    }
     return 'pt';
 }
 
-// ============================================================
-//   FUNÇÕES DE TRADUÇÃO
-// ============================================================
 function t(key) {
     return langDict[currentLang]?.[key] || langDict['pt'][key] || key;
 }
 
 // ============================================================
-//   ATUALIZAR UI
+//   ATUALIZAR UI + META TAGS
 // ============================================================
 function updateUI() {
     document.querySelector('#searchInput').placeholder = t('placeholder');
-    document.querySelector('#pageTitle').textContent = 
+    document.querySelector('#pageTitle').textContent =
         currentNav === 'home' ? t('popular') :
         currentNav === 'top' ? t('top') :
         currentNav === 'season' ? t('season') : t('genres');
     document.querySelector('#heroTitle').textContent = t('heroTitle');
     document.querySelector('#heroDesc').textContent = t('heroDesc');
     document.querySelector('#loadMoreBtn').textContent = t('loadMore');
-    // Nav
     document.querySelectorAll('#mainNav a').forEach(el => {
         const key = el.dataset.nav;
         el.textContent = t(key);
     });
-    // Dropdown label
     const langNames = { en: 'English', es: 'Español', pt: 'Português' };
     const flags = { en: '🇺🇸', es: '🇪🇸', pt: '🇧🇷' };
     document.querySelector('#langToggle').textContent = `${flags[currentLang]} ${langNames[currentLang]} ▾`;
-    // Itens do menu
     document.querySelectorAll('.lang-item').forEach(item => {
         item.classList.toggle('active', item.dataset.lang === currentLang);
     });
-    // Título da página
-    document.title = `AnimeFlix - ${t('home')} | Assista Animes Online`;
-    document.querySelector('meta[name="description"]').content = t('heroDesc');
+    updateMetaTags();
+    updateHreflang();
+}
+
+function updateMetaTags() {
+    let title = 'AnimeFlix - ';
+    let desc = '';
+    if (currentQuery) {
+        title += `Resultados para "${currentQuery}" - Assista Animes Online`;
+        desc = `Encontre animes relacionados a "${currentQuery}" em AnimeFlix. Episódios, temporadas e sinopse.`;
+    } else if (currentNav === 'home') {
+        title += 'Assista Animes Online Grátis - AnimeFlix';
+        desc = t('heroDesc');
+    } else if (currentNav === 'top') {
+        title += 'Top Animes - Os Mais Populares';
+        desc = 'Confira os animes mais bem avaliados e populares do momento.';
+    } else if (currentNav === 'season') {
+        title += 'Animes da Temporada Atual';
+        desc = 'Acompanhe os lançamentos da temporada com episódios e sinopse.';
+    } else if (currentNav === 'genres') {
+        title += 'Animes por Gênero - Ação, Comédia, Romance e mais';
+        desc = 'Explore animes organizados por gênero: ação, comédia, romance, fantasia, terror e muito mais.';
+    }
+    document.title = title;
+    document.querySelector('meta[name="description"]').content = desc;
+    document.querySelector('meta[property="og:title"]').content = title;
+    document.querySelector('meta[property="og:description"]').content = desc;
+    document.querySelector('meta[name="twitter:title"]').content = title;
+    document.querySelector('meta[name="twitter:description"]').content = desc;
+}
+
+function updateHreflang() {
+    const base = window.location.origin + window.location.pathname;
+    const current = window.location.search;
+    const params = new URLSearchParams(current);
+    params.delete('lang');
+    const baseSearch = params.toString() ? '?' + params.toString() : '';
+    document.querySelectorAll('link[hreflang]').forEach(link => {
+        if (link.getAttribute('hreflang') !== 'x-default') link.remove();
+    });
+    ['en','es','pt'].forEach(lang => {
+        const link = document.createElement('link');
+        link.rel = 'alternate';
+        link.hreflang = lang;
+        link.href = base + baseSearch + (baseSearch ? '&' : '?') + 'lang=' + lang;
+        document.head.appendChild(link);
+    });
 }
 
 // ============================================================
-//   API - BUSCAR ANIMES
+//   API - BUSCAR ANIMES COM CACHE
 // ============================================================
 async function fetchAnimes(page = 1, query = '', nav = 'home') {
+    const cacheKey = `anime_${nav}_${query}_${page}`;
+    if (cache[cacheKey]) {
+        return cache[cacheKey];
+    }
     let url = '';
     if (query) {
         url = `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}&page=${page}&limit=20`;
@@ -342,12 +399,23 @@ async function fetchAnimes(page = 1, query = '', nav = 'home') {
     const res = await fetch(url);
     if (!res.ok) throw new Error('API error');
     const data = await res.json();
-    return { animes: data.data || [], pagination: data.pagination };
+    cache[cacheKey] = data;
+    return data;
 }
 
 // ============================================================
-//   RENDER CARDS
+//   RENDER CARDS COM SKELETON
 // ============================================================
+function showSkeletons(count = 8) {
+    const grid = document.getElementById('animeGrid');
+    grid.innerHTML = '';
+    for (let i = 0; i < count; i++) {
+        const skeleton = document.createElement('div');
+        skeleton.className = 'skeleton';
+        grid.appendChild(skeleton);
+    }
+}
+
 function renderCards(animes, append = false) {
     const grid = document.getElementById('animeGrid');
     if (!append) grid.innerHTML = '';
@@ -357,7 +425,7 @@ function renderCards(animes, append = false) {
     }
     const html = animes.map(a => `
         <div class="anime-card" data-id="${a.mal_id}" onclick="openModal(${a.mal_id})">
-            <img src="${a.images.jpg.image_url}" alt="${a.title}" loading="lazy">
+            <img src="${a.images.jpg.image_url}" alt="${a.title}" loading="lazy" decoding="async">
             <div class="badge">${a.episodes || '?'}</div>
             <div class="info">
                 <div class="title">${a.title}</div>
@@ -376,7 +444,7 @@ function renderCards(animes, append = false) {
 }
 
 // ============================================================
-//   CARREGAR MAIS (BOTÃO)
+//   CARREGAR MAIS
 // ============================================================
 async function loadMore() {
     if (isLoading || !hasMore) return;
@@ -384,7 +452,7 @@ async function loadMore() {
     document.getElementById('loadMoreBtn').textContent = 'Carregando...';
     try {
         const nextPage = currentPage + 1;
-        const { animes, pagination } = await fetchAnimes(nextPage, currentQuery, currentNav);
+        const { data: animes, pagination } = await fetchAnimes(nextPage, currentQuery, currentNav);
         if (animes.length === 0) {
             hasMore = false;
             document.getElementById('loadMoreBtn').textContent = 'Fim da lista';
@@ -412,23 +480,25 @@ async function loadInitial(nav = 'home', query = '') {
     hasMore = true;
     allAnimes = [];
     document.getElementById('loadMoreBtn').textContent = t('loadMore');
-    document.getElementById('animeGrid').innerHTML = '<div style="text-align:center;padding:40px;color:#888;">Carregando...</div>';
+    showSkeletons(8);
     try {
-        const { animes, pagination } = await fetchAnimes(1, query, nav);
+        const { data: animes, pagination } = await fetchAnimes(1, query, nav);
         allAnimes = animes;
         renderCards(animes, false);
         hasMore = pagination?.has_next_page || false;
         document.getElementById('loadMoreBtn').textContent = hasMore ? t('loadMore') : 'Fim da lista';
-        document.querySelector('#pageTitle').textContent = 
+        document.querySelector('#pageTitle').textContent =
             query ? `Resultados para "${query}"` :
             nav === 'home' ? t('popular') :
             nav === 'top' ? t('top') :
             nav === 'season' ? t('season') : t('genres');
-        // Atualizar URL
         const params = new URLSearchParams();
         if (query) params.set('search', query);
         else params.set('nav', nav);
-        window.history.pushState({}, '', '?' + params.toString());
+        if (currentLang !== 'pt') params.set('lang', currentLang);
+        const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+        window.history.pushState({}, '', newUrl);
+        updateUI();
     } catch (err) {
         document.getElementById('animeGrid').innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:#e50914;">Erro ao carregar animes.</div>`;
     }
@@ -491,22 +561,25 @@ document.getElementById('searchInput').addEventListener('keydown', function(e) {
 });
 
 // ============================================================
-//   MODAL COM PLAYER
+//   MODAL COM PLAYER INSTANTÂNEO
 // ============================================================
 async function openModal(id) {
     const overlay = document.getElementById('modalOverlay');
     const body = document.getElementById('modalBody');
     overlay.classList.add('active');
-    body.innerHTML = '<div style="text-align:center;padding:30px;">Carregando...</div>';
+    body.innerHTML = `<div style="text-align:center;padding:30px;">${t('loading')}</div>`;
 
     try {
-        const res = await fetch(`https://api.jikan.moe/v4/anime/${id}/full`);
-        if (!res.ok) throw new Error();
-        const data = await res.json();
-        const anime = data.data;
+        // Buscar dados do anime e episódios em paralelo
+        const [animeRes, epRes] = await Promise.all([
+            fetch(`https://api.jikan.moe/v4/anime/${id}/full`),
+            fetch(`https://api.jikan.moe/v4/anime/${id}/episodes?limit=100`)
+        ]);
+        if (!animeRes.ok) throw new Error();
+        const animeData = await animeRes.json();
+        const anime = animeData.data;
         currentAnimeId = id;
 
-        const epRes = await fetch(`https://api.jikan.moe/v4/anime/${id}/episodes?limit=100`);
         let episodes = [];
         if (epRes.ok) {
             const epData = await epRes.json();
@@ -527,9 +600,16 @@ async function openModal(id) {
         const firstEp = episodes.length ? episodes[0].mal_id : 1;
         const titleSlug = anime.title.toLowerCase().replace(/\s/g, '-');
 
+        // Player embed com fallback
+        const embedUrls = [
+            `https://embed.animepahe.com/embed?anime=${encodeURIComponent(anime.title)}&ep=${firstEp}`,
+            `https://gogoanime.gg/embed/${titleSlug}-episode-${firstEp}`
+        ];
+
         body.innerHTML = `
-            <div class="modal-player">
-                <iframe id="playerIframe" src="https://gogoanime.llc/embed/${titleSlug}-episode-${firstEp}" allowfullscreen></iframe>
+            <div class="modal-player" id="playerContainer">
+                <div class="player-loading" id="playerLoading">${t('loading')}</div>
+                <iframe id="playerIframe" src="${embedUrls[0]}" allowfullscreen></iframe>
             </div>
             <h2>${anime.title}</h2>
             <button class="watch-btn" id="watchNowBtn">${t('watchNow')}</button>
@@ -552,12 +632,30 @@ async function openModal(id) {
             ` : ''}
         `;
 
-        // Assistir agora -> recarrega o iframe com o episódio atual
+        // Esconder loading após 1s (ou quando o iframe carregar)
+        setTimeout(() => {
+            const loading = document.getElementById('playerLoading');
+            if (loading) loading.classList.add('hidden');
+        }, 800);
+
+        // Assistir agora - recarrega o iframe com o episódio atual
         document.getElementById('watchNowBtn').addEventListener('click', function() {
             const iframe = document.getElementById('playerIframe');
             if (iframe) {
                 const epNum = currentEpisodes.length ? currentEpisodes[currentEpisodeIndex]?.mal_id || 1 : 1;
-                iframe.src = `https://gogoanime.llc/embed/${titleSlug}-episode-${epNum}`;
+                const loading = document.getElementById('playerLoading');
+                if (loading) loading.classList.remove('hidden');
+                iframe.src = `https://embed.animepahe.com/embed?anime=${encodeURIComponent(anime.title)}&ep=${epNum}`;
+                // Fallback se não carregar em 3s
+                setTimeout(() => {
+                    if (!iframe.src.includes('gogoanime')) {
+                        iframe.src = `https://gogoanime.gg/embed/${titleSlug}-episode-${epNum}`;
+                    }
+                }, 3000);
+                setTimeout(() => {
+                    const loading2 = document.getElementById('playerLoading');
+                    if (loading2) loading2.classList.add('hidden');
+                }, 1000);
             }
         });
 
@@ -570,28 +668,60 @@ async function openModal(id) {
                 currentEpisodeIndex = idx;
                 const iframe = document.getElementById('playerIframe');
                 if (iframe) {
-                    iframe.src = `https://gogoanime.llc/embed/${titleSlug}-episode-${ep.mal_id}`;
+                    const loading = document.getElementById('playerLoading');
+                    if (loading) loading.classList.remove('hidden');
+                    iframe.src = `https://embed.animepahe.com/embed?anime=${encodeURIComponent(anime.title)}&ep=${ep.mal_id}`;
+                    setTimeout(() => {
+                        if (!iframe.src.includes('gogoanime')) {
+                            iframe.src = `https://gogoanime.gg/embed/${titleSlug}-episode-${ep.mal_id}`;
+                        }
+                    }, 3000);
+                    setTimeout(() => {
+                        const loading2 = document.getElementById('playerLoading');
+                        if (loading2) loading2.classList.add('hidden');
+                    }, 1000);
                 }
                 document.querySelectorAll('.ep-btn').forEach(b => b.classList.remove('active-ep'));
                 this.classList.add('active-ep');
             });
         });
 
+        // SEO dinâmico
+        const title = `${anime.title} - Assista Online em AnimeFlix | Episódios, Sinopse`;
+        const desc = `Assista ${anime.title} online no AnimeFlix. ${synopsis.substring(0,150)}... Nota: ${anime.score || 'N/A'}, ${anime.episodes || '?'} episódios.`;
+        document.title = title;
+        document.querySelector('meta[name="description"]').content = desc;
+        document.querySelector('meta[property="og:title"]').content = title;
+        document.querySelector('meta[property="og:description"]').content = desc;
+        document.querySelector('meta[name="twitter:title"]').content = title;
+        document.querySelector('meta[name="twitter:description"]').content = desc;
+        if (anime.images.jpg.large_image_url) {
+            document.querySelector('meta[property="og:image"]').content = anime.images.jpg.large_image_url;
+            document.querySelector('meta[name="twitter:image"]').content = anime.images.jpg.large_image_url;
+        }
+        const canonical = document.querySelector('link[rel="canonical"]');
+        if (canonical) {
+            canonical.href = window.location.origin + window.location.pathname + '?anime=' + id;
+        }
         // JSON-LD
         const jsonld = {
             "@context": "https://schema.org",
             "@type": "TVSeries",
             "name": anime.title,
             "description": synopsis,
-            "image": anime.images.jpg.large_image_url,
+            "image": anime.images.jpg.large_image_url || '',
             "numberOfEpisodes": anime.episodes,
             "genre": anime.genres?.map(g => g.name).join(', '),
-            "aggregateRating": { "@type": "AggregateRating", "ratingValue": anime.score }
+            "aggregateRating": { "@type": "AggregateRating", "ratingValue": anime.score || 0 }
         };
         const script = document.createElement('script');
         script.type = 'application/ld+json';
         script.textContent = JSON.stringify(jsonld);
         body.appendChild(script);
+
+        // Atualizar URL com slug
+        const slug = anime.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        window.history.pushState({}, '', '?anime=' + slug);
 
     } catch (err) {
         body.innerHTML = `<p style="color:#e50914;">Erro ao carregar detalhes.</p>`;
@@ -602,6 +732,12 @@ function closeModal() {
     document.getElementById('modalOverlay').classList.remove('active');
     const iframe = document.getElementById('playerIframe');
     if (iframe) iframe.src = '';
+    updateUI();
+    const params = new URLSearchParams();
+    if (currentQuery) params.set('search', currentQuery);
+    else params.set('nav', currentNav);
+    if (currentLang !== 'pt') params.set('lang', currentLang);
+    window.history.pushState({}, '', '?' + params.toString());
 }
 
 // ============================================================
@@ -632,15 +768,14 @@ document.querySelectorAll('.lang-item').forEach(item => {
             return;
         }
         currentLang = lang;
-        updateUI();
         document.getElementById('langMenu').classList.remove('active');
-        // Recarregar conteúdo atual
         if (currentQuery) {
             loadInitial('home', currentQuery);
         } else {
             loadInitial(currentNav, '');
         }
         closeModal();
+        updateUI();
     });
 });
 document.addEventListener('click', function(e) {
@@ -650,7 +785,48 @@ document.addEventListener('click', function(e) {
 });
 
 // ============================================================
-//   EVENTOS GERAIS
+//   SITEMAP VIRTUAL E ROBOTS
+// ============================================================
+document.addEventListener('click', function(e) {
+    const link = e.target.closest('a');
+    if (!link) return;
+    const href = link.getAttribute('href');
+    if (href === '/sitemap.xml') {
+        e.preventDefault();
+        const base = window.location.origin + window.location.pathname;
+        let urls = [
+            { loc: base, priority: '1.0' },
+            { loc: base + '?nav=top', priority: '0.8' },
+            { loc: base + '?nav=season', priority: '0.8' },
+            { loc: base + '?nav=genres', priority: '0.8' }
+        ];
+        allAnimes.forEach(a => {
+            const slug = a.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            urls.push({ loc: base + '?anime=' + slug, priority: '0.9' });
+        });
+        let xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+        urls.forEach(u => {
+            xml += `  <url><loc>${u.loc}</loc><priority>${u.priority}</priority></url>\n`;
+        });
+        xml += '</urlset>';
+        const win = window.open('', '_blank');
+        if (win) {
+            win.document.write('<pre>' + xml.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</pre>');
+            win.document.title = 'Sitemap - AnimeFlix';
+        }
+    } else if (href === '/robots.txt') {
+        e.preventDefault();
+        const txt = `User-agent: *\nAllow: /\nDisallow: /?lang=*\nDisallow: /?search=*\nSitemap: ${window.location.origin}/sitemap.xml\nCrawl-delay: 2\n`;
+        const win = window.open('', '_blank');
+        if (win) {
+            win.document.write('<pre>' + txt + '</pre>');
+            win.document.title = 'robots.txt - AnimeFlix';
+        }
+    }
+});
+
+// ============================================================
+//   INICIALIZAÇÃO
 // ============================================================
 document.addEventListener('DOMContentLoaded', async () => {
     const detected = await detectLanguage();
@@ -660,7 +836,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     const params = new URLSearchParams(window.location.search);
     const search = params.get('search');
     const nav = params.get('nav') || 'home';
-    if (search) {
+    const animeParam = params.get('anime');
+    if (animeParam) {
+        loadInitial('home', '');
+        const title = animeParam.replace(/-/g, ' ');
+        try {
+            const res = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(title)}&limit=1`);
+            const data = await res.json();
+            if (data.data && data.data.length) {
+                openModal(data.data[0].mal_id);
+            }
+        } catch (_) {}
+    } else if (search) {
         document.getElementById('searchInput').value = search;
         loadInitial('home', search);
     } else {
@@ -676,11 +863,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('pageTitle').scrollIntoView({ behavior: 'smooth' });
     });
 
-    // Sitemap/robots
-    document.querySelectorAll('footer a[href*="sitemap"], footer a[href*="robots"]').forEach(link => {
-        link.addEventListener('click', (e) => {
+    document.querySelectorAll('.footer-links a[href*="search"]').forEach(link => {
+        link.addEventListener('click', function(e) {
             e.preventDefault();
-            alert('Em produção, este arquivo seria gerado dinamicamente.');
+            const query = this.textContent.trim();
+            document.getElementById('searchInput').value = query;
+            loadInitial('home', query);
         });
     });
 });
