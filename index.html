@@ -122,6 +122,12 @@
         .footer-links a { color: #888; transition: 0.2s; }
         .footer-links a:hover { color: #e50914; }
 
+        /* ERROR */
+        .error-box { background: rgba(229,9,20,0.15); border: 1px solid #e50914; border-radius: 12px; padding: 30px; text-align: center; margin: 20px 0; }
+        .error-box p { color: #fff; margin-bottom: 12px; }
+        .error-box .retry-btn { background: #e50914; border: none; color: #fff; padding: 10px 30px; border-radius: 30px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .error-box .retry-btn:hover { background: #b20710; }
+
         @media (max-width: 768px) {
             .header-inner { flex-wrap: wrap; justify-content: center; }
             .logo { font-size: 22px; }
@@ -191,6 +197,7 @@
     <div class="section-title" id="pageTitle">Populares</div>
     <div class="ad-container"></div>
     <div class="anime-grid" id="animeGrid"></div>
+    <div id="errorContainer"></div>
     <div class="load-more" id="loadMoreWrap">
         <button id="loadMoreBtn">Carregar mais</button>
     </div>
@@ -235,7 +242,8 @@ const langDict = {
         episodes: 'Episodes', score: 'Score', synopsis: 'Synopsis',
         loadMore: 'Load more', noResults: 'No animes found.',
         watchNow: '▶ Watch', dubbed: 'Dubbed', subbed: 'Subbed',
-        loading: 'Loading...'
+        loading: 'Loading...', error: 'Error loading animes. Please try again.',
+        retry: 'Retry'
     },
     es: {
         placeholder: 'Buscar animes...',
@@ -244,7 +252,8 @@ const langDict = {
         heroDesc: 'Descubre los mejores animes y mira online gratis.',
         episodes: 'Episodios', score: 'Puntuación', synopsis: 'Sinopsis',
         loadMore: 'Cargar más', noResults: 'No se encontraron animes.',
-        watchNow: '▶ Ver', dubbed: 'Doblado', subbed: 'Sub', loading: 'Cargando...'
+        watchNow: '▶ Ver', dubbed: 'Doblado', subbed: 'Sub', loading: 'Cargando...',
+        error: 'Error al cargar animes. Intente nuevamente.', retry: 'Reintentar'
     },
     pt: {
         placeholder: 'Buscar animes...',
@@ -254,7 +263,8 @@ const langDict = {
         episodes: 'Episódios', score: 'Nota', synopsis: 'Sinopse',
         loadMore: 'Carregar mais', noResults: 'Nenhum anime encontrado.',
         watchNow: '▶ Assistir', dubbed: 'Dublado', subbed: 'Legendado',
-        loading: 'Carregando...'
+        loading: 'Carregando...', error: 'Erro ao carregar animes. Tente novamente.',
+        retry: 'Tentar novamente'
     }
 };
 
@@ -271,9 +281,10 @@ let allAnimes = [];
 let currentAnimeId = null;
 let currentEpisodes = [];
 let currentEpisodeNumber = 1;
-let currentAudioLang = 'subbed'; // 'dubbed' ou 'subbed'
+let currentAudioLang = 'subbed';
 let currentAnimeTitle = '';
 let cache = {};
+let apiError = false;
 
 // ============================================================
 //   DETECTAR IDIOMA
@@ -366,35 +377,124 @@ function updateUI() {
 }
 
 // ============================================================
-//   API JIKAN (DADOS DOS ANIMES)
+//   API JIKAN (PRINCIPAL) + FALLBACK CONSUMET
 // ============================================================
 const JIKAN_BASE = 'https://api.jikan.moe/v4';
+const CONSUMET_BASE = 'https://api.consumet.org/anime/gogoanime';
+
+// Função com retry e fallback
+async function fetchWithFallback(url, maxRetries = 2) {
+    let lastError;
+    for (let i = 0; i < maxRetries; i++) {
+        try {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`Status ${res.status}`);
+            return await res.json();
+        } catch (e) {
+            lastError = e;
+            await new Promise(r => setTimeout(r, 1000 * (i + 1))); // espera 1s, 2s...
+        }
+    }
+    throw lastError;
+}
 
 async function fetchJikan(endpoint) {
     const url = `${JIKAN_BASE}${endpoint}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`Jikan API error: ${res.status}`);
-    return await res.json();
+    return await fetchWithFallback(url);
 }
 
-async function fetchPopular(page = 1) {
-    const data = await fetchJikan(`/top/anime?page=${page}&limit=20`);
-    return data;
+async function fetchConsumet(endpoint) {
+    const url = `${CONSUMET_BASE}${endpoint}`;
+    return await fetchWithFallback(url);
 }
 
-async function fetchSearch(query, page = 1) {
-    const data = await fetchJikan(`/anime?q=${encodeURIComponent(query)}&page=${page}&limit=20`);
-    return data;
-}
-
-async function fetchAnimeFull(id) {
-    const data = await fetchJikan(`/anime/${id}/full`);
-    return data;
-}
-
-async function fetchAnimeEpisodes(id, page = 1) {
-    const data = await fetchJikan(`/anime/${id}/episodes?page=${page}&limit=100`);
-    return data;
+// Função principal de carregamento de animes com fallback
+async function loadAnimes(page = 1, query = '', nav = 'home') {
+    try {
+        let data;
+        if (query) {
+            // Tenta Jikan primeiro
+            try {
+                data = await fetchJikan(`/anime?q=${encodeURIComponent(query)}&page=${page}&limit=20`);
+                if (data.data && data.data.length > 0) {
+                    return { animes: data.data, pagination: data.pagination || { has_next_page: false }, source: 'jikan' };
+                }
+                // Se Jikan retornar vazio, tenta Consumet
+                const consumetData = await fetchConsumet(`/search?query=${encodeURIComponent(query)}&page=${page}`);
+                const results = consumetData.results || [];
+                // Mapear para formato Jikan
+                const mapped = results.map(a => ({
+                    mal_id: a.id,
+                    title: a.title,
+                    images: { jpg: { image_url: a.image } },
+                    episodes: a.totalEpisodes || '?',
+                    score: a.rating || 'N/A',
+                    synopsis: a.description || ''
+                }));
+                return { animes: mapped, pagination: { has_next_page: false }, source: 'consumet' };
+            } catch (e) {
+                // Fallback para Consumet
+                const consumetData = await fetchConsumet(`/search?query=${encodeURIComponent(query)}&page=${page}`);
+                const results = consumetData.results || [];
+                const mapped = results.map(a => ({
+                    mal_id: a.id,
+                    title: a.title,
+                    images: { jpg: { image_url: a.image } },
+                    episodes: a.totalEpisodes || '?',
+                    score: a.rating || 'N/A',
+                    synopsis: a.description || ''
+                }));
+                return { animes: mapped, pagination: { has_next_page: false }, source: 'consumet' };
+            }
+        } else {
+            // Navegação: usar Jikan para 'top' e 'home'
+            try {
+                if (nav === 'top' || nav === 'home') {
+                    data = await fetchJikan(`/top/anime?page=${page}&limit=20`);
+                } else if (nav === 'season') {
+                    // Temporada atual
+                    const now = new Date();
+                    const year = now.getFullYear();
+                    const seasons = ['winter','spring','summer','fall'];
+                    const season = seasons[Math.floor((now.getMonth()+1)/3) % 4];
+                    data = await fetchJikan(`/seasons/${year}/${season}?page=${page}&limit=20`);
+                } else {
+                    data = await fetchJikan(`/top/anime?page=${page}&limit=20`);
+                }
+                if (data.data && data.data.length > 0) {
+                    return { animes: data.data, pagination: data.pagination || { has_next_page: false }, source: 'jikan' };
+                }
+                // Fallback para Consumet se Jikan retornar vazio
+                const consumetData = await fetchConsumet('/top-airing?page=' + page);
+                const results = consumetData.results || [];
+                const mapped = results.map(a => ({
+                    mal_id: a.id,
+                    title: a.title,
+                    images: { jpg: { image_url: a.image } },
+                    episodes: a.totalEpisodes || '?',
+                    score: a.rating || 'N/A',
+                    synopsis: a.description || ''
+                }));
+                return { animes: mapped, pagination: { has_next_page: false }, source: 'consumet' };
+            } catch (e) {
+                // Fallback Consumet
+                const consumetData = await fetchConsumet('/top-airing?page=' + page);
+                const results = consumetData.results || [];
+                const mapped = results.map(a => ({
+                    mal_id: a.id,
+                    title: a.title,
+                    images: { jpg: { image_url: a.image } },
+                    episodes: a.totalEpisodes || '?',
+                    score: a.rating || 'N/A',
+                    synopsis: a.description || ''
+                }));
+                return { animes: mapped, pagination: { has_next_page: false }, source: 'consumet' };
+            }
+        }
+    } catch (err) {
+        console.error('Erro ao carregar animes:', err);
+        throw err;
+    }
 }
 
 // ============================================================
@@ -444,27 +544,31 @@ function renderCards(animes, append = false) {
     }
 }
 
+function showError(message) {
+    const container = document.getElementById('errorContainer');
+    container.innerHTML = `
+        <div class="error-box">
+            <p>${message}</p>
+            <button class="retry-btn" onclick="window.retryLoad()">${t('retry')}</button>
+        </div>
+    `;
+}
+
+function clearError() {
+    document.getElementById('errorContainer').innerHTML = '';
+}
+
 // ============================================================
 //   CARREGAR CONTEÚDO
 // ============================================================
-async function loadAnimes(page = 1, query = '', nav = 'home') {
+async function loadContent(page = 1, query = '', nav = 'home') {
     try {
-        let data;
-        if (query) {
-            data = await fetchSearch(query, page);
-        } else if (nav === 'top') {
-            data = await fetchPopular(page);
-        } else if (nav === 'season') {
-            // Usa top para 'season' (não temos season na Jikan)
-            data = await fetchPopular(page);
-        } else {
-            data = await fetchPopular(page);
-        }
-        const animes = data.data || [];
-        const pagination = data.pagination || { has_next_page: false };
+        clearError();
+        const { animes, pagination } = await loadAnimes(page, query, nav);
         return { animes, pagination };
     } catch (err) {
         console.error(err);
+        showError(t('error'));
         return { animes: [], pagination: { has_next_page: false } };
     }
 }
@@ -475,7 +579,7 @@ async function loadMore() {
     document.getElementById('loadMoreBtn').textContent = 'Carregando...';
     try {
         const nextPage = currentPage + 1;
-        const { animes, pagination } = await loadAnimes(nextPage, currentQuery, currentNav);
+        const { animes, pagination } = await loadContent(nextPage, currentQuery, currentNav);
         if (animes.length === 0) {
             hasMore = false;
             document.getElementById('loadMoreBtn').textContent = 'Fim da lista';
@@ -488,6 +592,7 @@ async function loadMore() {
         document.getElementById('loadMoreBtn').textContent = hasMore ? t('loadMore') : 'Fim da lista';
     } catch (err) {
         document.getElementById('loadMoreBtn').textContent = 'Erro ao carregar';
+        showError(t('error'));
     } finally {
         isLoading = false;
     }
@@ -502,7 +607,7 @@ async function loadInitial(nav = 'home', query = '') {
     document.getElementById('loadMoreBtn').textContent = t('loadMore');
     showSkeletons(8);
     try {
-        const { animes, pagination } = await loadAnimes(1, query, nav);
+        const { animes, pagination } = await loadContent(1, query, nav);
         allAnimes = animes;
         renderCards(animes, false);
         hasMore = pagination.has_next_page || false;
@@ -519,10 +624,16 @@ async function loadInitial(nav = 'home', query = '') {
         window.history.pushState({}, '', '?' + params.toString());
         updateUI();
     } catch (err) {
-        document.getElementById('animeGrid').innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:#e50914;">Erro ao carregar animes. Tente novamente.</div>`;
+        document.getElementById('animeGrid').innerHTML = '';
+        showError(t('error'));
     }
     updateUI();
 }
+
+// Retry global
+window.retryLoad = function() {
+    loadInitial(currentNav, currentQuery);
+};
 
 // ============================================================
 //   BUSCA COM SUGESTÕES
@@ -538,7 +649,16 @@ document.getElementById('searchInput').addEventListener('input', function() {
     clearTimeout(searchTimeout);
     searchTimeout = setTimeout(async () => {
         try {
-            const data = await fetchSearch(q, 1);
+            // Tenta Jikan primeiro
+            let data;
+            try {
+                data = await fetchJikan(`/anime?q=${encodeURIComponent(q)}&limit=5`);
+            } catch (_) {
+                // Fallback Consumet
+                const consumetData = await fetchConsumet(`/search?query=${encodeURIComponent(q)}`);
+                const results = consumetData.results || [];
+                data = { data: results.map(a => ({ mal_id: a.id, title: a.title })) };
+            }
             const results = data.data || [];
             if (results.length) {
                 suggestions.innerHTML = results.slice(0, 5).map(a => `
@@ -589,17 +709,39 @@ async function openAnime(id) {
     body.innerHTML = `<div style="text-align:center;padding:30px;">${t('loading')}</div>`;
 
     try {
-        const animeData = await fetchAnimeFull(id);
-        const anime = animeData.data;
+        // Tenta Jikan primeiro
+        let anime, episodes;
+        try {
+            const animeData = await fetchJikan(`/anime/${id}/full`);
+            anime = animeData.data;
+            const epData = await fetchJikan(`/anime/${id}/episodes?limit=100`);
+            episodes = epData.data || [];
+        } catch (_) {
+            // Fallback Consumet (buscar pelo título)
+            const searchData = await fetchConsumet(`/search?query=${encodeURIComponent(anime?.title || '')}`);
+            const results = searchData.results || [];
+            const found = results.find(a => a.id == id) || results[0];
+            if (found) {
+                // Simular anime
+                anime = {
+                    title: found.title,
+                    synopsis: found.description || '',
+                    score: found.rating || 'N/A',
+                    episodes: found.totalEpisodes || '?',
+                    status: '',
+                    genres: [],
+                    images: { jpg: { large_image_url: found.image } }
+                };
+                episodes = [];
+            } else {
+                throw new Error('Anime não encontrado');
+            }
+        }
+
         currentAnimeId = id;
         currentAnimeTitle = anime.title;
-
-        // Buscar episódios
-        const epData = await fetchAnimeEpisodes(id);
-        const episodes = epData.data || [];
         currentEpisodes = episodes;
 
-        // Sinopse
         let synopsis = anime.synopsis || 'Sinopse não disponível.';
         if (currentLang !== 'en' && synopsis.length > 10) {
             try {
@@ -609,11 +751,9 @@ async function openAnime(id) {
             } catch (_) {}
         }
 
-        // Primeiro episódio
         let firstEp = episodes.length ? episodes[0].mal_id : 1;
         currentEpisodeNumber = firstEp;
 
-        // Montar modal
         body.innerHTML = `
             <div class="modal-player" id="playerContainer">
                 <div class="player-loading" id="playerLoading">${t('loading')}</div>
@@ -629,7 +769,7 @@ async function openAnime(id) {
                 <span>★ ${anime.score || 'N/A'}</span>
                 <span>${anime.episodes || '?'} ep.</span>
                 <span>${anime.status || ''}</span>
-                ${anime.genres ? anime.genres.slice(0,3).map(g => `<span>#${g.name}</span>`).join('') : ''}
+                ${anime.genres ? anime.genres.slice(0,3).map(g => `<span>#${g.name || g}</span>`).join('') : ''}
             </div>
             <div class="synopsis"><strong>${t('synopsis')}:</strong> ${synopsis}</div>
             ${episodes.length > 0 ? `
@@ -644,10 +784,8 @@ async function openAnime(id) {
             ` : ''}
         `;
 
-        // Carregar o primeiro episódio
         loadEpisode(firstEp);
 
-        // Eventos de áudio
         document.querySelectorAll('.watch-options button[data-lang]').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.watch-options button[data-lang]').forEach(b => b.classList.remove('active-lang'));
@@ -659,14 +797,12 @@ async function openAnime(id) {
             });
         });
 
-        // Assistir agora
         document.getElementById('watchNowBtn').addEventListener('click', function() {
             if (currentEpisodeNumber) {
                 loadEpisode(currentEpisodeNumber);
             }
         });
 
-        // Clique em episódio
         document.querySelectorAll('.ep-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const epNum = parseInt(this.dataset.ep);
@@ -689,7 +825,6 @@ async function openAnime(id) {
             document.querySelector('meta[property="og:image"]').content = anime.images.jpg.large_image_url;
             document.querySelector('meta[name="twitter:image"]').content = anime.images.jpg.large_image_url;
         }
-        // URL
         const slug = anime.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
         window.history.pushState({}, '', '?anime=' + slug);
 
@@ -705,27 +840,14 @@ function loadEpisode(epNum) {
     if (!iframe) return;
     if (loading) loading.classList.remove('hidden');
 
-    // Gerar slug do título
     const titleSlug = currentAnimeTitle.toLowerCase().replace(/\s/g, '-');
-
-    // Escolher embed conforme áudio
     let embedUrl;
     if (currentAudioLang === 'dubbed') {
-        // Tentar com 'dub' no final
         embedUrl = `https://gogoanime.llc/embed/${titleSlug}-episode-${epNum}-dub`;
     } else {
         embedUrl = `https://gogoanime.llc/embed/${titleSlug}-episode-${epNum}`;
     }
-
-    // Fallback: se não carregar, tenta sem o -dub
     iframe.src = embedUrl;
-    // Tentar carregar sem dub se falhar (para dubbed)
-    setTimeout(() => {
-        if (iframe.src.includes('dub') && !iframe.contentWindow) {
-            // Não temos como detectar, mas podemos tentar recarregar sem dub
-        }
-    }, 2000);
-
     setTimeout(() => {
         if (loading) loading.classList.add('hidden');
     }, 1500);
@@ -836,7 +958,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         loadInitial('home', '');
         const title = animeParam.replace(/-/g, ' ');
         try {
-            const data = await fetchSearch(title, 1);
+            const data = await fetchJikan(`/anime?q=${encodeURIComponent(title)}&limit=1`);
             const results = data.data || [];
             if (results.length) {
                 openAnime(results[0].mal_id);
@@ -871,6 +993,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 window.openAnime = openAnime;
 window.closeModal = closeModal;
 window.loadMore = loadMore;
+window.retryLoad = retryLoad;
 </script>
 </body>
 </html>
